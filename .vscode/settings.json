@@ -1,7 +1,129 @@
 {
 	"workbench.colorCustomizations": {
-		"activityBar.background": "#123508",
-		"titleBar.activeBackground": "#194A0C",
-		"titleBar.activeForeground": "#F3FDF0"
+		// Main cockpit structure - dark grays and blacks
+		"activityBar.background": "#0A0A0A",
+		"activityBar.foreground": "#4A9EFF",
+		"activityBar.activeBorder": "#FF6B35",
+		"activityBarBadge.background": "#FF6B35",
+		"activityBarBadge.foreground": "#FFFFFF",
+
+		// Title bar - cockpit frame
+		"titleBar.activeBackground": "#0A0A0A",
+		"titleBar.activeForeground": "#4A9EFF",
+		"titleBar.inactiveBackground": "#0A0A0A",
+		"titleBar.inactiveForeground": "#666666",
+
+		// Sidebar - control panels
+		"sideBar.background": "#0F0F0F",
+		"sideBar.foreground": "#CCCCCC",
+		"sideBarTitle.foreground": "#4A9EFF",
+		"sideBarSectionHeader.background": "#1A1A1A",
+		"sideBarSectionHeader.foreground": "#FF6B35",
+
+		// Editor - main cockpit window
+		"editor.background": "#0A0A0A",
+		"editor.foreground": "#E0E0E0",
+		"editor.lineHighlightBackground": "#1A1A1A",
+		"editor.selectionBackground": "#4A9EFF40",
+		"editor.findMatchBackground": "#FF6B3540",
+		"editor.findMatchHighlightBackground": "#FF6B3520",
+
+		// Status bar - data displays
+		"statusBar.background": "#0F0F0F",
+		"statusBar.foreground": "#4A9EFF",
+		"statusBar.debuggingBackground": "#FF6B35",
+		"statusBar.debuggingForeground": "#FFFFFF",
+
+		// Panel - lower control console
+		"panel.background": "#0F0F0F",
+		"panel.border": "#1A1A1A",
+		"panelTitle.activeForeground": "#4A9EFF",
+		"panelTitle.inactiveForeground": "#666666",
+
+		// Terminal - holographic displays
+		"terminal.background": "#0A0A0A",
+		"terminal.foreground": "#00FF41",
+		"terminalCursor.background": "#00FF41",
+		"terminalCursor.foreground": "#00FF41",
+
+		// Tabs - navigation panels
+		"tab.activeBackground": "#1A1A1A",
+		"tab.activeForeground": "#4A9EFF",
+		"tab.inactiveBackground": "#0F0F0F",
+		"tab.inactiveForeground": "#666666",
+		"tab.border": "#1A1A1A",
+
+		// Scrollbars - mechanical elements
+		"scrollbarSlider.background": "#333333",
+		"scrollbarSlider.hoverBackground": "#4A9EFF",
+		"scrollbarSlider.activeBackground": "#FF6B35",
+
+		// Input fields - control inputs
+		"input.background": "#1A1A1A",
+		"input.foreground": "#E0E0E0",
+		"input.border": "#333333",
+		"input.placeholderForeground": "#666666",
+
+		// Buttons - control buttons
+		"button.background": "#1A1A1A",
+		"button.foreground": "#4A9EFF",
+		"button.hoverBackground": "#333333",
+		"button.border": "#333333",
+
+		// Dropdowns - selection panels
+		"dropdown.background": "#1A1A1A",
+		"dropdown.foreground": "#E0E0E0",
+		"dropdown.border": "#333333",
+
+		// Notifications - alert systems
+		"notificationCenter.background": "#0F0F0F",
+		"notificationCenter.border": "#1A1A1A",
+		"notificationToast.border": "#1A1A1A",
+
+		// Progress bars - energy indicators
+		"progressBar.background": "#4A9EFF",
+
+		// Welcome page - startup sequence
+		"welcomePage.background": "#0A0A0A",
+		"welcomePage.tileBackground": "#1A1A1A",
+		"welcomePage.tileBorder": "#333333",
+		"welcomePage.tileHoverBackground": "#333333"
+	},
+	"workbench.preferredDarkColorTheme": "Default Dark+",
+	"editor.fontFamily": "'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace",
+	"editor.fontSize": 14,
+	"editor.lineHeight": 1.4,
+	"editor.cursorBlinking": "smooth",
+	"editor.cursorSmoothCaretAnimation": "on",
+	"editor.renderLineHighlight": "all",
+	"editor.minimap.enabled": true,
+	"editor.minimap.renderCharacters": false,
+	"editor.minimap.maxColumn": 80,
+	"editor.bracketPairColorization.enabled": true,
+	"editor.guides.bracketPairs": "active",
+	"editor.suggestSelection": "first",
+	"editor.tabCompletion": "on",
+	"editor.wordWrap": "on",
+	"editor.rulers": [80, 120],
+	"editor.renderWhitespace": "boundary",
+	"editor.insertSpaces": true,
+	"editor.detectIndentation": false,
+	"editor.tabSize": 4,
+	"files.trimTrailingWhitespace": true,
+	"files.insertFinalNewline": true,
+	"workbench.iconTheme": "vs-seti",
+	"workbench.startupEditor": "none",
+	"terminal.integrated.fontFamily": "'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace",
+	"terminal.integrated.fontSize": 13,
+	"terminal.integrated.cursorBlinking": true,
+	"terminal.integrated.cursorStyle": "line",
+	"git.decorations.enabled": true,
+	"explorer.confirmDelete": false,
+	"explorer.confirmDragAndDrop": false,
+	"search.showLineNumbers": true,
+	"search.smartCase": true,
+	"emmet.includeLanguages": {
+		"javascript": "javascriptreact",
+		"typescript": "typescriptreact"
 	}
 }
