@@ -10,7 +10,7 @@ import SwiftUI
 // MARK: - Card Row View
 struct PokemonCardRowView: View {
     let card: PokemonCard
-    
+
     var body: some View {
         HStack {
             // Card image placeholder
@@ -28,29 +28,29 @@ struct PokemonCardRowView: View {
             }
             .frame(width: 60, height: 84)
             .cornerRadius(8)
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(card.displayName)
                     .font(.headline)
                     .foregroundColor(.primary)
-                
+
                 Text("Set: \(card.setId.uppercased())")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                
+
                 Text("Card #\(card.cardNumber)")
                     .font(.caption)
                     .foregroundColor(.secondary)
-                
+
                 if card.variant != "std" {
                     Text("Variant: \(card.variant.uppercased())")
                         .font(.caption)
                         .foregroundColor(.blue)
                 }
             }
-            
+
             Spacer()
-            
+
             VStack(alignment: .trailing, spacing: 4) {
                 Text(card.language.uppercased())
                     .font(.caption)
@@ -58,7 +58,7 @@ struct PokemonCardRowView: View {
                     .padding(.vertical, 2)
                     .background(Color.blue.opacity(0.2))
                     .cornerRadius(4)
-                
+
                 Text(formatFileSize(card.fileSizeBytes))
                     .font(.caption2)
                     .foregroundColor(.secondary)
@@ -66,7 +66,7 @@ struct PokemonCardRowView: View {
         }
         .padding(.vertical, 4)
     }
-    
+
     private func formatFileSize(_ bytes: Int) -> String {
         let formatter = ByteCountFormatter()
         formatter.countStyle = .file
@@ -77,62 +77,68 @@ struct PokemonCardRowView: View {
 // MARK: - Card Detail View
 struct PokemonCardDetailView: View {
     let card: PokemonCard
-    
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Card Image
-                AsyncImage(url: URL(string: card.imageURL)) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                } placeholder: {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.gray.opacity(0.3))
-                        .overlay {
-                            VStack {
-                                Image(systemName: "photo")
-                                    .font(.system(size: 40))
-                                    .foregroundColor(.gray)
-                                Text("Loading...")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    // Full Screen Card Image
+                    AsyncImage(url: URL(string: card.imageURL)) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    } placeholder: {
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.3))
+                            .overlay {
+                                VStack {
+                                    Image(systemName: "photo")
+                                        .font(.system(size: 60))
+                                        .foregroundColor(.gray)
+                                    Text("Loading...")
+                                        .font(.title2)
+                                        .foregroundColor(.gray)
+                                }
+                            }
+                    }
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .background(Color.black)
+                    .clipped()
+
+                    // Card Details Section
+                    VStack(alignment: .leading, spacing: 20) {
+                        Text(card.displayName)
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .padding(.top, 20)
+
+                        VStack(alignment: .leading, spacing: 16) {
+                            Group {
+                                DetailRow(title: "Card ID", value: card.id)
+                                DetailRow(title: "Set", value: card.setId.uppercased())
+                                DetailRow(title: "Card Number", value: card.cardNumber)
+                                DetailRow(title: "Language", value: card.language.uppercased())
+                                DetailRow(title: "Variant", value: card.variant.uppercased())
+                                DetailRow(title: "Filename", value: card.filename)
+                                DetailRow(title: "File Size", value: formatFileSize(card.fileSizeBytes))
                             }
                         }
-                }
-                .frame(maxHeight: 400)
-                .cornerRadius(12)
-                .shadow(radius: 5)
-                
-                // Card Details
-                VStack(alignment: .leading, spacing: 16) {
-                    Text(card.displayName)
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    
-                    Group {
-                        DetailRow(title: "Card ID", value: card.id)
-                        DetailRow(title: "Set", value: card.setId.uppercased())
-                        DetailRow(title: "Card Number", value: card.cardNumber)
-                        DetailRow(title: "Language", value: card.language.uppercased())
-                        DetailRow(title: "Variant", value: card.variant.uppercased())
-                        DetailRow(title: "Filename", value: card.filename)
-                        DetailRow(title: "File Size", value: formatFileSize(card.fileSizeBytes))
+
+                        // Extra spacing at the bottom
+                        Spacer()
+                            .frame(height: 50)
                     }
+                    .padding()
+                    .background(Color(UIColor.systemBackground))
                 }
-                .padding()
-                .background(Color(UIColor.systemBackground))
-                .cornerRadius(12)
-                .shadow(radius: 2)
-                
-                Spacer()
             }
-            .padding()
+            .ignoresSafeArea(.all, edges: .top)
         }
-        .navigationTitle("Card Details")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
     }
-    
+
     private func formatFileSize(_ bytes: Int) -> String {
         let formatter = ByteCountFormatter()
         formatter.countStyle = .file
@@ -144,15 +150,15 @@ struct PokemonCardDetailView: View {
 struct DetailRow: View {
     let title: String
     let value: String
-    
+
     var body: some View {
         HStack {
             Text(title)
                 .fontWeight(.medium)
                 .foregroundColor(.secondary)
-            
+
             Spacer()
-            
+
             Text(value)
                 .fontWeight(.regular)
                 .foregroundColor(.primary)
