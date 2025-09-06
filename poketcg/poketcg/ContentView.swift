@@ -8,63 +8,26 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var cardService = PokemonCardService()
-
     var body: some View {
-        NavigationSplitView {
-            // Cards list
-            List {
-                ForEach(filteredCards) { card in
-                    NavigationLink {
-                        PokemonCardDetailView(card: card)
-                    } label: {
-                        PokemonCardRowView(card: card)
-                    }
+        TabView {
+            FeedView()
+                .tabItem {
+                    Image(systemName: "shuffle")
+                    Text("Feed")
                 }
-            }
-            .refreshable {
-                await cardService.fetchCards()
-            }
-            .navigationTitle("Pokemon Cards")
-            .toolbar {
-                ToolbarItem {
-                    Button(action: {
-                        Task {
-                            await cardService.fetchCards()
-                        }
-                    }) {
-                        Label("Refresh", systemImage: "arrow.clockwise")
-                    }
-                    .disabled(cardService.isLoading)
-                }
-            }
-        } detail: {
-            Text("Select a Pokemon card")
-                .foregroundColor(.secondary)
-        }
-        .task {
-            if cardService.cards.isEmpty {
-                await cardService.fetchCards()
-            }
-        }
-        .overlay {
-            if cardService.isLoading {
-                ProgressView("Loading Pokemon Cards...")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.black.opacity(0.1))
-            }
-        }
-        .alert("Error", isPresented: .constant(cardService.errorMessage != nil)) {
-            Button("OK") {
-                cardService.errorMessage = nil
-            }
-        } message: {
-            Text(cardService.errorMessage ?? "")
-        }
-    }
 
-    private var filteredCards: [PokemonCard] {
-        return cardService.cards
+            ListView()
+                .tabItem {
+                    Image(systemName: "list.bullet")
+                    Text("List")
+                }
+
+            SearchView()
+                .tabItem {
+                    Image(systemName: "magnifyingglass")
+                    Text("Search")
+                }
+        }
     }
 }
 
