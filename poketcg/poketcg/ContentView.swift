@@ -6,56 +6,68 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @StateObject private var cardService = PokemonCardService()
 
     var body: some View {
         NavigationSplitView {
+            // Cards list
             List {
-                ForEach(items) { item in
+                ForEach(filteredCards) { card in
                     NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                        PokemonCardDetailView(card: card)
                     } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                        PokemonCardRowView(card: card)
                     }
                 }
-                .onDelete(perform: deleteItems)
             }
+            .refreshable {
+                await cardService.fetchCards()
+            }
+            .navigationTitle("Pokemon Cards")
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
                 ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    Button(action: {
+                        Task {
+                            await cardService.fetchCards()
+                        }
+                    }) {
+                        Label("Refresh", systemImage: "arrow.clockwise")
                     }
+                    .disabled(cardService.isLoading)
                 }
             }
         } detail: {
-            Text("Select an item")
+            Text("Select a Pokemon card")
+                .foregroundColor(.secondary)
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+        .task {
+            if cardService.cards.isEmpty {
+                await cardService.fetchCards()
             }
         }
+        .overlay {
+            if cardService.isLoading {
+                ProgressView("Loading Pokemon Cards...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.black.opacity(0.1))
+            }
+        }
+        .alert("Error", isPresented: .constant(cardService.errorMessage != nil)) {
+            Button("OK") {
+                cardService.errorMessage = nil
+            }
+        } message: {
+            Text(cardService.errorMessage ?? "")
+        }
+    }
+
+    private var filteredCards: [PokemonCard] {
+        return cardService.cards
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
