@@ -77,42 +77,131 @@ struct PokemonCardRowView: View {
 // MARK: - Card Detail View
 struct PokemonCardDetailView: View {
     let card: PokemonCard
+    @State private var scale: CGFloat = 1.0
+    @State private var lastScale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
 
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
                 VStack(spacing: 0) {
-                    // Full Screen Card Image
-                    AsyncImage(url: URL(string: card.imageURL)) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    } placeholder: {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                            .overlay {
-                                VStack {
-                                    Image(systemName: "photo")
-                                        .font(.system(size: 60))
-                                        .foregroundColor(.gray)
-                                    Text("Loading...")
-                                        .font(.title2)
-                                        .foregroundColor(.gray)
+                    // Card Image Container with proper spacing
+                    ZStack {
+                        // Black background for full screen
+                        Color.black
+
+                        VStack {
+                            // Top spacer for navigation bar
+                            Spacer()
+                                .frame(height: 60)
+
+                            // Zoomable card image
+                            ZStack {
+                                AsyncImage(url: URL(string: card.imageURL)) { image in
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .scaleEffect(scale)
+                                        .offset(offset)
+                                        .padding(.horizontal, 20)
+                                } placeholder: {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.gray.opacity(0.3))
+                                        .overlay {
+                                            VStack(spacing: 12) {
+                                                Image(systemName: "photo")
+                                                    .font(.system(size: 60))
+                                                    .foregroundColor(.gray)
+                                                Text("Loading...")
+                                                    .font(.title2)
+                                                    .foregroundColor(.gray)
+                                            }
+                                        }
+                                        .scaleEffect(scale)
+                                        .offset(offset)
+                                        .padding(.horizontal, 20)
+                                }
+
+                                // Metallic shimmer overlay
+                                MetalShineOverlay()
+                                    .scaleEffect(scale)
+                                    .offset(offset)
+                                    .padding(.horizontal, 20)
+                            }
+                            .clipped()
+                            .gesture(
+                                SimultaneousGesture(
+                                    // Magnification gesture for zoom
+                                    MagnificationGesture()
+                                        .onChanged { value in
+                                            let delta = value / lastScale
+                                            lastScale = value
+                                            let newScale = scale * delta
+                                            scale = min(max(newScale, 0.5), 3.0) // Limit zoom between 0.5x and 3x
+                                        }
+                                        .onEnded { _ in
+                                            lastScale = 1.0
+                                            // Snap back if zoomed out too much
+                                            if scale < 1.0 {
+                                                withAnimation(.easeInOut(duration: 0.3)) {
+                                                    scale = 1.0
+                                                    offset = .zero
+                                                }
+                                            }
+                                        },
+
+                                    // Drag gesture for panning when zoomed
+                                    DragGesture()
+                                        .onChanged { value in
+                                            if scale > 1.0 {
+                                                let newOffset = CGSize(
+                                                    width: lastOffset.width + value.translation.width,
+                                                    height: lastOffset.height + value.translation.height
+                                                )
+                                                offset = newOffset
+                                            }
+                                        }
+                                        .onEnded { _ in
+                                            lastOffset = offset
+                                        }
+                                )
+                            )
+                            .onTapGesture(count: 2) {
+                                // Double tap to reset zoom
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    scale = 1.0
+                                    offset = .zero
+                                    lastOffset = .zero
                                 }
                             }
+
+                            // Bottom spacer for centering
+                            Spacer()
+                                .frame(height: 60)
+                        }
                     }
                     .frame(width: geometry.size.width, height: geometry.size.height)
-                    .background(Color.black)
                     .clipped()
 
-                    // Card Details Section
-                    VStack(alignment: .leading, spacing: 20) {
-                        Text(card.displayName)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .padding(.top, 20)
+                    // Card Details Section with improved spacing
+                    VStack(alignment: .leading, spacing: 0) {
+                        // Header section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(card.displayName)
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
 
-                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Card Details")
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.top, 32)
+                        .padding(.bottom, 24)
+
+                        // Details grid
+                        VStack(alignment: .leading, spacing: 20) {
                             Group {
                                 DetailRow(title: "Card ID", value: card.id)
                                 DetailRow(title: "Set", value: card.setId.uppercased())
@@ -124,11 +213,11 @@ struct PokemonCardDetailView: View {
                             }
                         }
 
-                        // Extra spacing at the bottom
+                        // Bottom spacing for comfortable scrolling
                         Spacer()
-                            .frame(height: 50)
+                            .frame(height: 80)
                     }
-                    .padding()
+                    .padding(.horizontal, 24)
                     .background(Color(UIColor.systemBackground))
                 }
             }
@@ -152,18 +241,80 @@ struct DetailRow: View {
     let value: String
 
     var body: some View {
-        HStack {
+        VStack(alignment: .leading, spacing: 6) {
             Text(title)
+                .font(.caption)
                 .fontWeight(.medium)
                 .foregroundColor(.secondary)
-
-            Spacer()
+                .textCase(.uppercase)
+                .tracking(0.5)
 
             Text(value)
+                .font(.body)
                 .fontWeight(.regular)
                 .foregroundColor(.primary)
         }
-        .padding(.vertical, 2)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+        .background(Color(UIColor.secondarySystemBackground))
+        .cornerRadius(12)
+    }
+}
+
+// MARK: - Metal Shine Overlay
+struct MetalShineOverlay: View {
+    @State private var moveGradient = false
+    @State private var animationTimer: Timer?
+
+    var body: some View {
+        // Metallic shimmer overlay
+        LinearGradient(
+            gradient: Gradient(colors: [
+                .white.opacity(0.1),
+                .white.opacity(0.6),
+                .white.opacity(0.1)
+            ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .blendMode(.overlay) // this makes it look metallic
+        .mask(
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [.clear, .white, .clear]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .rotationEffect(.degrees(30))
+                .offset(x: moveGradient ? 300 : -300)
+        )
+        .animation(
+            Animation.linear(duration: 2.0),
+            value: moveGradient
+        )
+        .onAppear {
+            startAnimationCycle()
+        }
+        .onDisappear {
+            animationTimer?.invalidate()
+        }
+    }
+
+    private func startAnimationCycle() {
+        // Start the first animation
+        moveGradient = true
+
+        // Set up timer to restart animation after pause
+        animationTimer = Timer.scheduledTimer(withTimeInterval: 7.0, repeats: true) { _ in
+            // Reset position and animate again
+            moveGradient = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                moveGradient = true
+            }
+        }
     }
 }
 
